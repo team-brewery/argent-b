@@ -1,4 +1,5 @@
 const path = require("path")
+const { ProvidePlugin } = require("webpack")
 const HtmlWebPackPlugin = require("html-webpack-plugin")
 const CopyPlugin = require("copy-webpack-plugin")
 
@@ -55,6 +56,9 @@ module.exports = {
         { from: "./src/manifest.json", to: "manifest.json" },
         { from: "./src/assets", to: "assets" },
       ],
+    }),
+    new ProvidePlugin({
+      Buffer: ["buffer", "Buffer"],
     }),
   ],
   resolve: {

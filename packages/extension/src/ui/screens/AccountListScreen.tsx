@@ -2,6 +2,7 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import Add from "../../assets/add.svg"
+import LedgerLogo from "../../assets/ledger-logo.svg"
 import Settings from "../../assets/settings.svg"
 import { AccountList, AccountListItem } from "../components/Account/AccountList"
 import { AccountHeader } from "../components/Account/Header"
@@ -11,6 +12,7 @@ import { H1, H2, P } from "../components/Typography"
 import { makeClickable } from "../utils/a11y"
 import { getStatus } from "../utils/wallet"
 import { Wallet } from "../Wallet"
+import { StarkSignerType } from "../../shared/starkSigner"
 
 const AccountListWrapper = styled.div`
   display: flex;
@@ -35,7 +37,7 @@ const Paragraph = styled(P)`
 
 interface AccountListScreenProps {
   onAccountSelect?: (account: string) => void
-  onAddAccount?: () => void
+  onAddAccount?: (type: StarkSignerType) => void
   onSettings?: () => void
   wallets: Wallet[]
   activeWallet: string
@@ -78,8 +80,11 @@ export const AccountListScreen: FC<AccountListScreenProps> = ({
           onClick={() => onAccountSelect?.(wallet.address)}
         />
       ))}
-      <IconButtonCenter size={48} {...makeClickable(onAddAccount)}>
+      <IconButtonCenter size={48} {...makeClickable(() => { onAddAccount?.(StarkSignerType.KeyPair) })}>
         <Add />
+      </IconButtonCenter>
+      <IconButtonCenter size={48} {...makeClickable(() => { onAddAccount?.(StarkSignerType.Ledger) })}>
+        <LedgerLogo />
       </IconButtonCenter>
     </AccountList>
   </AccountListWrapper>

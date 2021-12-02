@@ -3,6 +3,7 @@ import type { InvokeFunctionTransaction } from "starknet"
 
 import { ActionItem } from "../background/actionQueue"
 import { BackupWallet } from "./backup.model"
+import { StarkSignerType } from "./starkSigner"
 
 export type MessageType =
   | { type: "OPEN_UI" }
@@ -34,7 +35,7 @@ export type MessageType =
   | { type: "RESET_ALL" }
   | { type: "REQ_PUB" }
   | { type: "REQ_PUB_RES"; data: JWK }
-  | { type: "NEW_ACCOUNT"; data: string }
+  | { type: "NEW_ACCOUNT"; data: { networkId: string; type: StarkSignerType } }
   | { type: "STOP_SESSION" }
   | {
       type: "NEW_ACCOUNT_RES"

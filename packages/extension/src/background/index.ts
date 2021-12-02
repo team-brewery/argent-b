@@ -192,10 +192,10 @@ async function main() {
         const sessionPassword = getSession()
         if (!sessionPassword) throw Error("you need an open session")
 
-        const network = msg.data
-        const newAccount = await createAccount(sessionPassword, network)
+        const { networkId, type } = msg.data
+        const newAccount = await createAccount(sessionPassword, networkId, type)
 
-        const wallet = { address: newAccount.address, network }
+        const wallet = { address: newAccount.address, network: networkId, type }
         store.setItem("SELECTED_WALLET", wallet)
 
         return sendToTabAndUi({ type: "NEW_ACCOUNT_RES", data: newAccount })

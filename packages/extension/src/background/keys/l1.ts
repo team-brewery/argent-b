@@ -4,6 +4,12 @@ import { Provider, compileCalldata, ec, stark } from "starknet"
 import browser from "webextension-polyfill"
 
 import { BackupWallet } from "../../shared/backup.model"
+import { StarkSignerType } from "../../shared/starkSigner"
+import {
+  KeyPairSigner,
+  LedgerSigner,
+  StarkSigner,
+} from "../../shared/starkSigner"
 import { Storage } from "../storage"
 
 const isDev = process.env.NODE_ENV === "development"
@@ -123,10 +129,31 @@ function downloadTextFile(text: string, filename: string) {
 export const getWallets = async (): Promise<BackupWallet[]> =>
   await store.getItem("wallets")
 
-export async function createAccount(password: string, networkId: string) {
+export const getSigner = async (
+  password: string,
+  type: StarkSignerType,
+): Promise<StarkSigner> => {
+  switch (type) {
+    case StarkSignerType.KeyPair:
+      const l1 = await getL1(password)
+      return new KeyPairSigner(l1.privateKey)
+    case StarkSignerType.Ledger:
+      return new LedgerSigner()
+  }
+}
+
+export async function createAccount(
+  password: string,
+  networkId: string,
+  type: StarkSignerType,
+) {
   const l1 = await getL1(password)
-  const starkPair = ec.getKeyPair(l1.privateKey)
-  const starkPub = ec.getStarkKey(starkPair)
+
+  const signer = await getSigner(password, type)
+  await signer.connect()
+
+  console.log("starkPub", signer.starkPub)
+
   const seed = ec.getStarkKey(ec.genKeyPair())
   const wallets = await getWallets()
 
@@ -134,7 +161,7 @@ export async function createAccount(password: string, networkId: string) {
   const deployTransaction = await provider.deployContract(
     ArgentCompiledContract,
     compileCalldata({
-      signer: starkPub,
+      signer: signer.starkPub,
       guardian: "0",
     }),
     seed,
@@ -146,7 +173,11 @@ export async function createAccount(password: string, networkId: string) {
     throw new Error("Deploy transaction failed")
   }
 
-  const newWallet = { network: networkId, address: deployTransaction.address! }
+  const newWallet = {
+    network: networkId,
+    address: deployTransaction.address!,
+    type: signer.type,
+  }
   const newWallets = [...wallets, newWallet]
   const encKeyStore = await getEncKeyStore(l1, password, newWallets)
   store.setItem("encKeystore", encKeyStore)

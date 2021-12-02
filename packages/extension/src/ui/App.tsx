@@ -194,7 +194,7 @@ function App() {
       <AccountListScreen
         wallets={Object.values(state.context.wallets)}
         activeWallet={state.context.selectedWallet}
-        onAddAccount={() => send("ADD_WALLET")}
+        onAddAccount={(type) => send({ type: "ADD_WALLET", data: type })}
         onSettings={() => send("SHOW_SETTINGS")}
         onAccountSelect={(address) => {
           send({ type: "SELECT_WALLET", data: address })

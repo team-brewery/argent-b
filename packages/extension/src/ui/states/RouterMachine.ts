@@ -4,6 +4,7 @@ import { DoneInvokeEvent, assign, createMachine } from "xstate"
 
 import { sendMessage } from "../../shared/messages"
 import { defaultNetworkId } from "../../shared/networks"
+import { LedgerSigner, StarkSignerType } from "../../shared/starkSigner"
 import {
   getLastSelectedWallet,
   getWallets,
@@ -45,7 +46,7 @@ type RouterEvents =
       type: "ADD_TOKEN"
       data: { address: string; symbol: string; name: string; decimals: string }
     }
-  | { type: "ADD_WALLET" }
+  | { type: "ADD_WALLET"; data: StarkSignerType }
   | {
       type: "APPROVE_TX"
       data: TransactionRequest | InvokeFunctionTransaction
@@ -318,7 +319,15 @@ export const routerMachine = createMachine<
           if (event.type === "GENERATE_L1")
             await startSession(event.data.password)
 
-          const newWallet = await Wallet.fromDeploy(ctx.networkId)
+          const signerType =
+            event.type === "ADD_WALLET" ? event.data : StarkSignerType.KeyPair
+
+          // trick to have permission handler
+          if (signerType === StarkSignerType.Ledger) {
+            await LedgerSigner.askPermissionIfNeeded()
+          }
+
+          const newWallet = await Wallet.fromDeploy(ctx.networkId, signerType)
 
           return {
             newWallet,

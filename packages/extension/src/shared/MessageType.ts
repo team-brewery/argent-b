@@ -53,7 +53,7 @@ export type MessageType =
   | { type: "START_SESSION_RES" }
   | { type: "RECOVER_KEYSTORE"; data: string }
   | { type: "RECOVER_KEYSTORE_RES" }
-  | { type: "SIGN"; data: { hash: string } }
+  | { type: "SIGN"; data: { hash: string; type: StarkSignerType } }
   | { type: "SIGN_RES"; data: { r: string; s: string } }
 
 export type WindowMessageType = {

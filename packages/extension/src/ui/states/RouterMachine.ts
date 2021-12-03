@@ -230,7 +230,9 @@ export const routerMachine = createMachine<
 
           return {
             wallets: wallets
-              .map(({ address }) => new Wallet(address, networkId))
+              .map(
+                ({ address, type = 0 }) => new Wallet(address, networkId, type),
+              )
               .reduce((acc, wallet) => {
                 return {
                   ...acc,
@@ -350,7 +352,11 @@ export const routerMachine = createMachine<
       entry: async (ctx) => {
         sendMessage({
           type: "WALLET_CONNECTED",
-          data: { address: ctx.selectedWallet!, network: ctx.networkId },
+          data: {
+            address: ctx.selectedWallet!,
+            network: ctx.networkId,
+            type: ctx.wallets[ctx.selectedWallet!].signerType,
+          },
         })
       },
       on: {

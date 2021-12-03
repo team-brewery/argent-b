@@ -24,11 +24,18 @@ const ArgentCompiledContractJson: CompiledContract = json.parse(
 
 export class Wallet {
   address: string
+  signerType: StarkSignerType
   deployTransaction?: string
   contract: Contract
 
-  constructor(address: string, networkId: string, deployTransaction?: string) {
+  constructor(
+    address: string,
+    networkId: string,
+    signerType: StarkSignerType,
+    deployTransaction?: string,
+  ) {
     this.address = address
+    this.signerType = signerType
     this.deployTransaction = deployTransaction
     this.contract = new Contract(
       ArgentCompiledContractJson.abi,
@@ -73,7 +80,10 @@ export class Wallet {
       hash.hashMessage(this.address, address, selector, calldata, nonce),
     )
 
-    sendMessage({ type: "SIGN", data: { hash: messageHash } })
+    sendMessage({
+      type: "SIGN",
+      data: { hash: messageHash, type: this.signerType },
+    })
     const { r, s } = await waitForMessage("SIGN_RES")
 
     return this.contract.invoke(
@@ -98,6 +108,7 @@ export class Wallet {
     return new Wallet(
       deployTransaction.address,
       networkId,
+      type,
       deployTransaction.txHash,
     )
   }

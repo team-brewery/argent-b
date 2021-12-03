@@ -1,4 +1,7 @@
+import { BigNumber } from "@ethersproject/bignumber"
+import { hexZeroPad } from "@ethersproject/bytes"
 import Eth from "@ledgerhq/hw-app-eth"
+import Transport from "@ledgerhq/hw-transport"
 import TransportWebHID from "@ledgerhq/hw-transport-webhid"
 import { KeyPair, ec } from "starknet"
 
@@ -8,8 +11,8 @@ export enum StarkSignerType {
 }
 
 export interface Signature {
-  r: string
-  s: string
+  r: BigNumber
+  s: BigNumber
 }
 
 export interface StarkSigner {
@@ -42,16 +45,19 @@ export class LedgerSigner implements StarkSigner {
   type = StarkSignerType.Ledger
   derivationPath = "/2645'/579218131'/1148870696'/0'/0'/0"
   starkPub: string = ""
+  static transport: Transport
 
-  async getEthApp(): Promise<Eth> {
+  static async getEthApp(): Promise<Eth> {
     console.log("isSupported", await TransportWebHID.isSupported())
-
-    const transport = await TransportWebHID.create()
-    return new Eth(transport)
+    if (!this.transport) {
+      console.log("create TransportWebHID")
+      this.transport = await TransportWebHID.create()
+    }
+    return new Eth(this.transport)
   }
 
   async connect(): Promise<string> {
-    const eth = await this.getEthApp()
+    const eth = await LedgerSigner.getEthApp()
 
     const response = await eth.starkGetPublicKey(this.derivationPath)
     this.starkPub = `0x${response.slice(1, 1 + 32).toString("hex")}`
@@ -60,14 +66,17 @@ export class LedgerSigner implements StarkSigner {
   }
 
   async sign(messageHash: string): Promise<Signature> {
-    const eth = await this.getEthApp()
+    const eth = await LedgerSigner.getEthApp()
 
     const signature = (await eth.starkUnsafeSign(
       this.derivationPath,
-      messageHash,
-    )) as Signature
+      hexZeroPad(messageHash, 32),
+    )) as { r: string; s: string }
 
-    return signature
+    return {
+      r: BigNumber.from(`0x${signature.r}`),
+      s: BigNumber.from(`0x${signature.s}`),
+    }
   }
 
   static async askPermissionIfNeeded(): Promise<void> {

@@ -11,6 +11,7 @@ import {
   createAccount,
   existsL1,
   getL1,
+  getSigner,
   getWallets,
   setKeystore,
   validatePassword,
@@ -39,7 +40,7 @@ async function main() {
   const actionQueue = await getQueue<ActionItem>("ACTIONS")
 
   const store = new Storage<{ SELECTED_WALLET: BackupWallet }>({
-    SELECTED_WALLET: { address: "", network: "" },
+    SELECTED_WALLET: { address: "", network: "", type: 0 },
   })
 
   messageStream.subscribe(async ([msg, sender]) => {
@@ -203,10 +204,11 @@ async function main() {
       case "SIGN": {
         const sessionPassword = getSession()
         if (!sessionPassword) throw Error("you need an open session")
-        const l1 = await getL1(sessionPassword)
-        const starkPair = ec.getKeyPair(l1.privateKey)
-        const { hash } = msg.data
-        const { r, s } = ec.sign(starkPair, hash)
+
+        const { hash, type } = msg.data
+        const signer = await getSigner(sessionPassword, type)
+        const { r, s } = await signer.sign(hash)
+
         return sendToTabAndUi({
           type: "SIGN_RES",
           data: {

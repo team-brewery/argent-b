@@ -8,6 +8,8 @@ import { AccountColumn, AccountRow } from "./Header"
 import { NetworkStatusIndicator, NetworkStatusWrapper } from "../NetworkSwitcher"
 import { ProfilePicture } from "./ProfilePicture"
 
+import LedgerLogo from "../../../assets/ledger-logo.svg"
+
 export const AccountList = styled.div`
   display: flex;
   flex-direction: column;
@@ -53,6 +55,7 @@ interface AccountListProps {
   accountNumber: number
   address: string
   status: WalletStatus
+  isLedger: boolean
   onClick?: () => void
 }
 
@@ -60,11 +63,13 @@ export const AccountListItem: FC<AccountListProps> = ({
   accountNumber,
   address,
   status,
+  isLedger,
   onClick,
 }) => {
   return (
     <AccountListItemWrapper {...makeClickable(onClick)}>
-      <ProfilePicture src={getAccountImageUrl(accountNumber)} />
+      { !isLedger &&  <ProfilePicture src={getAccountImageUrl(accountNumber)} /> }
+      { isLedger && <LedgerLogo /> }
       <AccountRow>
         <AccountColumn>
           <AccountName>Account {accountNumber}</AccountName>

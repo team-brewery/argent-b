@@ -74,6 +74,7 @@ export const AccountListScreen: FC<AccountListScreenProps> = ({
       {wallets.map((wallet, index) => (
         <AccountListItem
           key={wallet.address}
+          isLedger={wallet.signerType === 1}
           accountNumber={index + 1}
           address={wallet.address}
           status={getStatus(wallet, activeWallet)}

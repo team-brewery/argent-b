@@ -44,7 +44,13 @@ type RouterEvents =
     }
   | {
       type: "ADD_TOKEN"
-      data: { address: string; symbol: string; name: string; decimals: string }
+      data: {
+        address: string
+        symbol: string
+        name: string
+        decimals: string
+        networkId: string
+      }
     }
   | { type: "ADD_WALLET"; data: StarkSignerType }
   | {
@@ -81,6 +87,7 @@ type RouterTypestate =
         | "enterPassword"
         | "verifyPassword"
         | "recover"
+        | "recoverNetwork"
         | "disclaimer"
         | "reset"
         | "settings"
@@ -138,7 +145,7 @@ export const routerMachine = createMachine<
         },
         onDone: [
           {
-            target: "recover",
+            target: "recoverNetwork",
             cond: (ctx, ev) => {
               const event = ev as DoneInvokeEvent<boolean>
               return event.data
@@ -193,7 +200,7 @@ export const routerMachine = createMachine<
           useProgress.setState({ progress: 0, text: "" })
         },
         onDone: {
-          target: "recover",
+          target: "recoverNetwork",
           actions: assign((_, _ev) => ({
             error: undefined,
           })),
@@ -208,19 +215,39 @@ export const routerMachine = createMachine<
         },
       },
     },
+    recoverNetwork: {
+      invoke: {
+        src: async () => {
+          const { network } = await getLastSelectedWallet()
+
+          if (!network) throw Error("No network stored")
+
+          return {
+            networkId: network,
+          }
+        },
+        onDone: {
+          target: "recover",
+          actions: assign((_, ev) => ({
+            networkId: ev.data.networkId,
+          })),
+        },
+        onError: "recover",
+      },
+    },
     recover: {
       invoke: {
         src: async ({ networkId }, ev) => {
+          const lastSelectedWallet = await getLastSelectedWallet().catch(
+            () => null,
+          )
+
           const wallets = (await getWallets()).filter(
             ({ network }) => network === networkId,
           )
 
-          const lastSelectedWallet = await getLastSelectedWallet().catch(
-            () => "",
-          )
-
           const selectedWallet = wallets.find(
-            ({ address }) => address === lastSelectedWallet,
+            ({ address }) => address === lastSelectedWallet?.address,
           )?.address
 
           // if actions are pending show them first

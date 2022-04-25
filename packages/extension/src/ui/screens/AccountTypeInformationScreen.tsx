@@ -69,6 +69,7 @@ export const AccountTypeInformationContentScreen: FC = () => {
   const { switcherNetworkId } = useAppState()
 
   const [usedParams, setUsedParams] = useState<string[]>([])
+  const [usedParamNames, setUsedParamNamess] = useState<string[]>([])
   const [compiledMultisig, setCompiledMultisig] = useState<CompiledContract>()
   const { deploy: deployMultisig } = useContractFactory({
     compiledContract: compiledMultisig,
@@ -118,14 +119,17 @@ export const AccountTypeInformationContentScreen: FC = () => {
       switch (accountType.key) {
         case "default": {
           setUsedParams(["123"])
+          setUsedParamNamess(["Public key"])
           break
         }
         case "multisig": {
           setUsedParams(["1", "123", "1"])
+          setUsedParamNamess(["Amount of owners", "Owners", "Threshold"])
           break
         }
         case "allow_deny_list": {
           setUsedParams(["123"])
+          setUsedParamNamess(["Public key"])
         }
       }
     }
@@ -262,7 +266,7 @@ export const AccountTypeInformationContentScreen: FC = () => {
             {usedParams &&
               usedParams.map((p, i) => (
                 <span key={i}>
-                  <span>Parameter {i + 1}:</span>
+                  <span>{usedParamNames[i]}:&nbsp;</span>
                   <input
                     type="text"
                     value={p}
@@ -281,4 +285,3 @@ export const AccountTypeInformationContentScreen: FC = () => {
       </AccountList>
     </AccountListWrapper>
   )
-}

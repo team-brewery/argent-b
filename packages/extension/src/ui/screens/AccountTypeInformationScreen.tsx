@@ -1,21 +1,22 @@
-import { CollectionsOutlined } from "@mui/icons-material"
-import SettingsIcon from "@mui/icons-material/Settings"
 import { FC, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Abi, CompiledContract, json } from "starknet"
 import styled from "styled-components"
 
 import MultisigSource from "../../abi/Multisig.json"
+import DefaultSource from "../../abi/Default.json"
 import { AccountType } from "../AccountType"
 import { Container } from "../components/Account/AccountContainer"
 import { AccountHeader } from "../components/Account/AccountHeader"
 import { Button } from "../components/Button"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
+import { BackButton } from "../components/BackButton"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { H1, P } from "../components/Typography"
 import { useContractFactory } from "../hooks/useDeploy"
 import { routes } from "../routes"
+import { useSelectedAccount } from "../states/account"
 import { selectAccountType, useAccountType } from "../states/accountType"
 import { useAppState } from "../states/app"
 import { useBackupRequired } from "../states/backupDownload"
@@ -61,12 +62,10 @@ export const AccountTypeInformationContentScreen: FC = () => {
   const { isBackupRequired } = useBackupRequired()
 
   const [compiledMultisig, setCompiledMultisig] = useState<CompiledContract>()
-
   const { deploy: deployMultisig } = useContractFactory({
     compiledContract: compiledMultisig,
     abi: (MultisigSource as any).abi as Abi,
   })
-
   const getCompiledMultisig = async () => {
     const raw = await fetch(
       "https://starknet-multisig.vercel.app/Multisig.json",
@@ -74,6 +73,19 @@ export const AccountTypeInformationContentScreen: FC = () => {
     console.log("raw", raw)
     const compiled = json.parse(await raw.text())
     console.log("found compiled", compiled)
+    return compiled
+  }
+  
+  const [compiledDefault, setCompiledDefault] = useState<CompiledContract>()
+  const { deploy: deployDefault } = useContractFactory({
+    compiledContract: compiledDefault,
+    abi: (DefaultSource as any).abi as Abi,
+  })
+  const getCompiledDefault = async () => {
+    const raw = await fetch(
+      "../../public/contract/Default.json",
+    )
+    const compiled = json.parse(await raw.text())
     return compiled
   }
 
@@ -86,22 +98,46 @@ export const AccountTypeInformationContentScreen: FC = () => {
     if (!compiledMultisig) {
       getCompiledMultisig().then(setCompiledMultisig)
     }
+    if (!compiledDefault) {
+      getCompiledDefault().then(setCompiledDefault)
+    }
   }, [])
 
   if (!accountType) {
-    return <>aaa</>
+    return <></>
   }
 
   const deployWalletAccount = async () => {
     //useAppState.setState({ isLoading: true })
 
-    const calldata = ["1", "2", "3"]
-    console.log("starting deploy")
-    const deployment = await deployMultisig({
-      constructorCalldata: calldata,
-    })
-    if (deployment) {
-      console.log("dpeloyed to", deployment.address)
+    console.log(accountType.name)
+
+    switch (accountType.key) {
+      case "default": {
+        const calldataDefault = ["1", "2", "3"]
+        console.log("starting deploy")
+        const defaultDeployment = await deployDefault({
+          constructorCalldata: calldataDefault,
+        })
+        if (defaultDeployment) {
+          console.log("deployed to", defaultDeployment.address)
+        }
+        break
+      }
+      case "multisig": {
+        const calldataMultisig = ["1", "2", "3"]
+        console.log("starting deploy")
+        const multisigDeployment = await deployMultisig({
+          constructorCalldata: calldataMultisig,
+        })
+        if (multisigDeployment) {
+          console.log("deployed to", multisigDeployment.address)
+        }
+        break
+      }
+      default: {
+        break
+      }
     }
 
     // deploy accountType
@@ -127,7 +163,7 @@ export const AccountTypeInformationContentScreen: FC = () => {
             size={36}
             {...makeClickable(() => navigate(routes.settings()), 99)}
           >
-            <SettingsIcon />
+            <BackButton />
           </IconButton>
           <NetworkSwitcher />
         </Header>

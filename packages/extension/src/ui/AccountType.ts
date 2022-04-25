@@ -1,4 +1,5 @@
 export class AccountType {
+  key: string
   name: string
   creator: string
   version: string
@@ -8,11 +9,13 @@ export class AccountType {
   // proxyContract: Contract
 
   constructor(
+    key: string,
     name: string,
     creator: string,
     version: string,
     description: string
   ) {
+    this.key = key
     this.name = name
     this.creator = creator
     this.version = version

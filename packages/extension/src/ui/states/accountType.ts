@@ -21,7 +21,6 @@ export const useAccountType = create<State>((set) => ({
 }))
 
 export const selectAccountType = ({ accountTypes, selectedAccountType }: State) => {
-  console.log(selectedAccountType)
   if (selectedAccountType) {
     return accountTypes[selectedAccountType]
   }

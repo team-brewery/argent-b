@@ -1,24 +1,25 @@
 import AddIcon from "@mui/icons-material/Add"
 import SettingsIcon from "@mui/icons-material/Settings"
-import { FC } from "react"
+import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { Container } from "../components/Account/AccountContainer"
 import { AccountHeader } from "../components/Account/AccountHeader"
-import { AccountListItem } from "../components/Account/AccountListItem"
+import { AccountTypeItem } from "../components/Account/AccountTypeItem"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { RecoveryBanner } from "../components/RecoveryBanner"
 import { H1, P } from "../components/Typography"
 import { routes } from "../routes"
-import { useAccount } from "../states/account"
+import { useAccountType } from "../states/accountType"
 import { useAppState } from "../states/app"
 import { useBackupRequired } from "../states/backupDownload"
 import { makeClickable } from "../utils/a11y"
 import { connectAccount, deployAccount, getStatus } from "../utils/accounts"
 import { recover } from "../utils/recovery"
+import { AccountType } from "../AccountType"
 
 const AccountList = styled.div`
   display: flex;
@@ -48,17 +49,23 @@ const Paragraph = styled(P)`
   text-align: center;
 `
 
-export const AccountListScreen: FC = () => {
+export const AccountTypeSelectionScreen: FC = () => {
   const navigate = useNavigate()
-  const { switcherNetworkId } = useAppState()
-  const { accounts, selectedAccount, addAccount } = useAccount()
+  const { accountTypes, addAccountType } = useAccountType()
   const { isBackupRequired } = useBackupRequired()
 
-  const accountsList = Object.values(accounts)
+  const accountTypeList = Object.values(accountTypes)
+
+  useEffect(() => {
+    addAccountType(new AccountType(0, "Multisig"))
+    addAccountType(new AccountType(1, "Filtered Contracts"))
+    addAccountType(new AccountType(2, "secp256k1 signing"))
+    addAccountType(new AccountType(3, "Fee delegation"))
+    addAccountType(new AccountType(4, "Debit wallet"))
+  }, []);
 
   const handleAddAccount = async () => {
     useAppState.setState({ isLoading: false })
-    navigate(routes.accountTypeSelection())
     // try {
     //   const newAccount = await deployAccount(switcherNetworkId)
     //   addAccount(newAccount)
@@ -85,21 +92,18 @@ export const AccountListScreen: FC = () => {
           <NetworkSwitcher />
         </Header>
       </AccountHeader>
-      <H1>Accounts</H1>
+      <H1>Account Type Selection</H1>
       <AccountList>
         {isBackupRequired && <RecoveryBanner noMargins />}
-        {accountsList.length === 0 && (
+        {accountTypeList.length === 0 && (
           <Paragraph>
-            No accounts on this network, click below to add one.
+            No accounts types available.
           </Paragraph>
         )}
-        {accountsList.map((account) => (
-          <AccountListItem
-            key={account.address}
-            account={account}
-            status={getStatus(account, selectedAccount)}
-            isDeleteable={switcherNetworkId === "localhost"}
-            canShowUpgrade
+        {accountTypeList.map((accountType) => (
+          <AccountTypeItem
+            key={accountType.id}
+            accountType={accountType}
           />
         ))}
         <IconButtonCenter size={48} {...makeClickable(handleAddAccount)}>

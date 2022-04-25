@@ -5,6 +5,7 @@ import {
   Account,
   AddTransactionResponse,
   ec,
+  number,
   shortString,
   stark,
 } from "starknet"

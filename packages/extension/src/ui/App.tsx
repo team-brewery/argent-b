@@ -8,6 +8,7 @@ import { SWRConfig } from "swr"
 import { useEntry } from "./hooks/useEntry"
 import { useTransactionErrorScreen } from "./hooks/useTransactionErrorScreen"
 import { routes } from "./routes"
+import { AccountTypeSelectionScreen } from "./screens/AccountTypeSelectionScreen"
 import { AccountListScreen } from "./screens/AccountListScreen"
 import { AccountScreen } from "./screens/AccountScreen"
 import { ActionScreen } from "./screens/ActionScreen"
@@ -177,6 +178,7 @@ const Screen: FC = () => {
             <Route path={routes.account()} element={<AccountScreen />} />
             <Route path={routes.upgrade()} element={<UpgradeScreen />} />
             <Route path={routes.accounts()} element={<AccountListScreen />} />
+            <Route path={routes.accountTypeSelection()} element={<AccountTypeSelectionScreen />} />
             <Route
               path={routes.confirmSeedRecovery()}
               element={<ConfirmSeedRecoveryPage />}

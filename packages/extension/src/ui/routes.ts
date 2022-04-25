@@ -1,3 +1,5 @@
+import { AccountType } from "./AccountType";
+
 export const routes = {
   welcome: () => "/index.html",
   newWallet: () => "/wallets/new",
@@ -11,6 +13,8 @@ export const routes = {
   account: () => "/account",
   upgrade: () => "/account/upgrade",
   accounts: () => "/accounts",
+  accountTypeSelection: () => "/accountTypeSelection",
+  accountTypeInformation: (accountType: AccountType) => `/accountTypeInformation`,
   newToken: () => "/tokens/new",
   token: (tokenAddress: string) => `/tokens/${tokenAddress}`,
   tokenPath: () => "/tokens/:tokenAddress",

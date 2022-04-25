@@ -1,10 +1,12 @@
 import { FC, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Abi, CompiledContract, json } from "starknet"
+import { Abi, CompiledContract, Contract, json } from "starknet"
 import styled from "styled-components"
 
 import DefaultSource from "../../abi/Default.json"
 import MultisigSource from "../../abi/Multisig.json"
+import { WalletAccountSigner } from "../../shared/wallet.model"
+import { Account } from "../Account"
 import { AccountType } from "../AccountType"
 import { Container } from "../components/Account/AccountContainer"
 import { AccountHeader } from "../components/Account/AccountHeader"
@@ -16,11 +18,12 @@ import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { H1, P } from "../components/Typography"
 import { useContractFactory } from "../hooks/useDeploy"
 import { routes } from "../routes"
-import { useSelectedAccount } from "../states/account"
+import { useAccount, useSelectedAccount } from "../states/account"
 import { selectAccountType, useAccountType } from "../states/accountType"
 import { useAppState } from "../states/app"
 import { useBackupRequired } from "../states/backupDownload"
 import { makeClickable } from "../utils/a11y"
+import { getNetwork } from "../utils/messaging"
 
 const AccountList = styled.div`
   display: flex;
@@ -60,6 +63,9 @@ export const AccountTypeInformationContentScreen: FC = () => {
   const navigate = useNavigate()
 
   const { isBackupRequired } = useBackupRequired()
+
+  const { accounts, selectedAccount, addAccount } = useAccount()
+  const { switcherNetworkId } = useAppState()
 
   const [usedParams, setUsedParams] = useState<string[]>()
   const [compiledMultisig, setCompiledMultisig] = useState<CompiledContract>()
@@ -122,29 +128,52 @@ export const AccountTypeInformationContentScreen: FC = () => {
     console.log("aaa")
   }
 
+  const createAccount = async (contract: Contract) => {
+    const network = await getNetwork(switcherNetworkId)
+    if (network) {
+      const dummySigner: WalletAccountSigner = {
+        type: "",
+        derivationPath: "",
+      }
+
+      const acc = new Account(
+        contract.address,
+        network,
+        dummySigner, //result.account.signer,
+        contract.txHash,
+      )
+      addAccount(acc)
+    }
+  }
+
   const deployWalletAccount = async () => {
     //useAppState.setState({ isLoading: true })
 
     console.log(accountType.name)
     if (usedParams) {
+      let currDeployment: Contract | undefined = undefined
       switch (accountType.key) {
         case "default": {
           console.log("starting deploy")
-          const defaultDeployment = await deployDefault({
+          currDeployment = await deployDefault({
             constructorCalldata: usedParams,
           })
-          if (defaultDeployment) {
-            console.log("deployed to", defaultDeployment.address)
+          if (currDeployment) {
+            console.log("deployed to", currDeployment.address)
+            createAccount(currDeployment)
           }
+
           break
         }
         case "multisig": {
           console.log("starting deploy")
-          const multisigDeployment = await deployMultisig({
+          currDeployment = await deployMultisig({
             constructorCalldata: usedParams,
           })
-          if (multisigDeployment) {
-            console.log("deployed to", multisigDeployment.address)
+
+          if (currDeployment) {
+            console.log("deployed to", currDeployment.address)
+            createAccount(currDeployment)
           }
           break
         }

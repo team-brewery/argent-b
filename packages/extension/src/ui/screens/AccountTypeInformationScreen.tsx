@@ -69,7 +69,7 @@ export const AccountTypeInformationContentScreen: FC = () => {
 
   const getCompiledMultisig = async () => {
     const raw = await fetch(
-      "https://starknet-multisig.vercel.app/Multisig.json",
+      "https://raw.githubusercontent.com/team-brewery/argent-b/feature/account-selection/packages/extension/src/abi/Multisig.json",
     )
     console.log("raw", raw)
     const compiled = json.parse(await raw.text())
@@ -95,7 +95,7 @@ export const AccountTypeInformationContentScreen: FC = () => {
   const deployWalletAccount = async () => {
     //useAppState.setState({ isLoading: true })
 
-    const calldata = ["1", "2", "3"]
+    const calldata = ["1", "2"]
     console.log("starting deploy")
     const deployment = await deployMultisig({
       constructorCalldata: calldata,

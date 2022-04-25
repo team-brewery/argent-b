@@ -2833,6 +2833,13 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
+"@starknet-react/core@^0.7.2":
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/@starknet-react/core/-/core-0.7.2.tgz#bffed474ea816dba3ac893d8adcd6e98634b06d7"
+  integrity sha512-093U2VY73ih3eFo0chTgaLL67lm3mszEvrqDAdVRaRX9aFjUMzBc+SU0HerW3NVJ4X8Nq48nuE2wJIO8RZSjUQ==
+  dependencies:
+    immutable "^4.0.0"
+
 "@svgr/babel-plugin-add-jsx-attribute@^6.0.0":
   version "6.0.0"
   resolved "https://registry.npmjs.org/@svgr/babel-plugin-add-jsx-attribute/-/babel-plugin-add-jsx-attribute-6.0.0.tgz#bd6d1ff32a31b82b601e73672a789cc41e84fe18"
@@ -6164,6 +6171,11 @@ ignore@^5.1.8, ignore@^5.1.9, ignore@^5.2.0:
   version "5.2.0"
   resolved "https://registry.npmjs.org/ignore/-/ignore-5.2.0.tgz#6d3bac8fa7fe0d45d9f9be7bac2fc279577e345a"
   integrity sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==
+
+immutable@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/immutable/-/immutable-4.0.0.tgz#b86f78de6adef3608395efb269a91462797e2c23"
+  integrity sha512-zIE9hX70qew5qTUjSS7wi1iwj/l7+m54KWU247nhM3v806UdGj1yDndXj+IOYxxtW9zyLI+xqFNZjTuDaLUqFw==
 
 import-fresh@^2.0.0:
   version "2.0.0"

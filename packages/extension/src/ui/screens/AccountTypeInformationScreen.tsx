@@ -1,4 +1,3 @@
-import AddIcon from "@mui/icons-material/Add"
 import SettingsIcon from "@mui/icons-material/Settings"
 import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
@@ -9,16 +8,14 @@ import { AccountHeader } from "../components/Account/AccountHeader"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
-import { RecoveryBanner } from "../components/RecoveryBanner"
 import { H1, P } from "../components/Typography"
 import { routes } from "../routes"
-import { useAccountType } from "../states/accountType"
+import { useAccountType, selectAccountType } from "../states/accountType"
 import { useAppState } from "../states/app"
 import { useBackupRequired } from "../states/backupDownload"
 import { makeClickable } from "../utils/a11y"
-import { connectAccount, deployAccount, getStatus } from "../utils/accounts"
-import { recover } from "../utils/recovery"
 import { AccountType } from "../AccountType"
+import { Button } from "../components/Button"
 
 const AccountList = styled.div`
   display: flex;
@@ -48,16 +45,37 @@ const Paragraph = styled(P)`
   text-align: center;
 `
 
-interface AccountTypeInformationScreenProps {
+export const AccountTypeInformationScreen: FC = () => {
+  const navigate = useNavigate()
+  const accountType = useAccountType(selectAccountType)
+
+  useEffect(() => {
+    if (!accountType) {
+      navigate(routes.accountTypeSelection())
+    }
+  }, [])
+
+  if (!accountType) {
+    return <>aaa</>
+  }
+
+  return <AccountTypeInformationContentScreen accountType={accountType} />
+}
+
+interface AccountTypeInformationScreenContentProps {
   accountType: AccountType
 }
 
-export const AccountTypeInformationScreen: FC<AccountTypeInformationScreenProps> = ({ accountType }) => {
+export const AccountTypeInformationContentScreen: FC<AccountTypeInformationScreenContentProps> = ({ accountType }) => {
   const navigate = useNavigate()
   const { isBackupRequired } = useBackupRequired()
 
-  const handleAddAccount = async () => {
-    useAppState.setState({ isLoading: false })
+  const deployWalletAccount = async () => {
+    useAppState.setState({ isLoading: true })
+
+    const accountType = useAccountType(selectAccountType)
+    // deploy accountType
+    
     // try {
     //   const newAccount = await deployAccount(switcherNetworkId)
     //   addAccount(newAccount)
@@ -86,11 +104,12 @@ export const AccountTypeInformationScreen: FC<AccountTypeInformationScreenProps>
       </AccountHeader>
       <H1>Account Type Selection</H1>
       <AccountList>
-        {isBackupRequired && <RecoveryBanner noMargins />}
-        {accountType.name}
-        <IconButtonCenter size={48} {...makeClickable(handleAddAccount)}>
-          <AddIcon fontSize="large" />
-        </IconButtonCenter>
+        <Paragraph>
+          {accountType.name}
+        </Paragraph>
+        <Button onClick={() => deployWalletAccount()}>
+          Deploy Wallet Account
+        </Button>
       </AccountList>
     </AccountListWrapper>
   )

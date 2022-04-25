@@ -57,11 +57,11 @@ export const AccountTypeSelectionScreen: FC = () => {
   const accountTypeList = Object.values(accountTypes)
 
   useEffect(() => {
-    addAccountType(new AccountType(0, "Multisig"))
-    addAccountType(new AccountType(1, "Filtered Contracts"))
-    addAccountType(new AccountType(2, "secp256k1 signing"))
-    addAccountType(new AccountType(3, "Fee delegation"))
-    addAccountType(new AccountType(4, "Debit wallet"))
+    addAccountType(new AccountType("Multisig"))
+    addAccountType(new AccountType("Filtered Contracts"))
+    addAccountType(new AccountType("secp256k1 signing"))
+    addAccountType(new AccountType("Fee delegation"))
+    addAccountType(new AccountType("Debit wallet"))
   }, []);
 
   const handleAddAccount = async () => {
@@ -94,7 +94,6 @@ export const AccountTypeSelectionScreen: FC = () => {
       </AccountHeader>
       <H1>Account Type Selection</H1>
       <AccountList>
-        {isBackupRequired && <RecoveryBanner noMargins />}
         {accountTypeList.length === 0 && (
           <Paragraph>
             No accounts types available.
@@ -102,7 +101,7 @@ export const AccountTypeSelectionScreen: FC = () => {
         )}
         {accountTypeList.map((accountType) => (
           <AccountTypeItem
-            key={accountType.id}
+            key={accountType.name}
             accountType={accountType}
           />
         ))}

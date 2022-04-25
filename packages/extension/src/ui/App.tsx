@@ -46,6 +46,7 @@ import { useSelectedNetwork } from "./states/selectedNetwork"
 import { recoverBySeedPhrase } from "./utils/messaging"
 import { recover } from "./utils/recovery"
 import { swrCacheProvider } from "./utils/swrCache"
+import { AccountTypeInformationScreen } from "./screens/AccountTypeInformationScreen"
 
 const GlobalStyle = createGlobalStyle`
   ${normalize}
@@ -179,6 +180,7 @@ const Screen: FC = () => {
             <Route path={routes.upgrade()} element={<UpgradeScreen />} />
             <Route path={routes.accounts()} element={<AccountListScreen />} />
             <Route path={routes.accountTypeSelection()} element={<AccountTypeSelectionScreen />} />
+            <Route path={routes.accountTypeInformation()} element={<AccountTypeInformationScreen />} />
             <Route
               path={routes.confirmSeedRecovery()}
               element={<ConfirmSeedRecoveryPage />}

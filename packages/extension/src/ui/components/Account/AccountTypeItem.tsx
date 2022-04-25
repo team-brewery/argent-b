@@ -4,8 +4,9 @@ import styled, { css } from "styled-components"
 
 import { AccountType } from "../../AccountType"
 import { routes } from "../../routes"
+import { useAccountType } from "../../states/accountType"
 import { makeClickable } from "../../utils/a11y"
-import { AccountStatus, getAccountImageUrl } from "../../utils/accounts"
+import { getAccountTypeImageUrl } from "../../utils/accountTypes"
 import { NetworkStatusWrapper } from "../NetworkSwitcher"
 import { AccountColumn } from "./AccountColumn"
 import { AccountRow } from "./AccountRow"
@@ -75,16 +76,17 @@ export const AccountTypeItem: FC<AccountListProps> = ({
   return (
     <AccountListItemWrapper
       {...makeClickable(() => {
-        navigate(routes.accountTypeInformation(accountType))
+        useAccountType.setState({ selectedAccountType: accountType.name })
+        navigate(routes.accountTypeInformation())
       })}
       // className={isDeleteable ? "deleteable" : ""}
       // selected={status.code === "CONNECTED"}
     >
-      <ProfilePicture src={getAccountImageUrl(accountType.name, accountType.id.toString())} />
+      <ProfilePicture src={getAccountTypeImageUrl(accountType.name)} />
       <AccountRow>
         <AccountColumn>
           <AccountName>{accountType.name}</AccountName>
-          <p>{accountType.id}</p>
+          <p>Hii</p>
         </AccountColumn>
       </AccountRow>
     </AccountListItemWrapper>

@@ -83,7 +83,7 @@ export const AccountTypeInformationContentScreen: FC = () => {
   })
   const getCompiledDefault = async () => {
     const raw = await fetch(
-      "../../public/contract/Default.json",
+      "https://raw.githubusercontent.com/team-brewery/argent-b/feature/account-selection/packages/extension/src/abi/Default.json",
     )
     const compiled = json.parse(await raw.text())
     return compiled

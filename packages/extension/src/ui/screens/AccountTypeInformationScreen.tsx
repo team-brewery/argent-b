@@ -3,15 +3,15 @@ import { useNavigate } from "react-router-dom"
 import { Abi, CompiledContract, json } from "starknet"
 import styled from "styled-components"
 
-import MultisigSource from "../../abi/Multisig.json"
 import DefaultSource from "../../abi/Default.json"
+import MultisigSource from "../../abi/Multisig.json"
 import { AccountType } from "../AccountType"
 import { Container } from "../components/Account/AccountContainer"
 import { AccountHeader } from "../components/Account/AccountHeader"
+import { BackButton } from "../components/BackButton"
 import { Button } from "../components/Button"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
-import { BackButton } from "../components/BackButton"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
 import { H1, P } from "../components/Typography"
 import { useContractFactory } from "../hooks/useDeploy"
@@ -61,6 +61,7 @@ export const AccountTypeInformationContentScreen: FC = () => {
 
   const { isBackupRequired } = useBackupRequired()
 
+  const [usedParams, setUsedParams] = useState<string[]>()
   const [compiledMultisig, setCompiledMultisig] = useState<CompiledContract>()
   const { deploy: deployMultisig } = useContractFactory({
     compiledContract: compiledMultisig,
@@ -70,12 +71,10 @@ export const AccountTypeInformationContentScreen: FC = () => {
     const raw = await fetch(
       "https://raw.githubusercontent.com/team-brewery/argent-b/feature/account-selection/packages/extension/src/abi/Multisig.json",
     )
-    console.log("raw", raw)
     const compiled = json.parse(await raw.text())
-    console.log("found compiled", compiled)
     return compiled
   }
-  
+
   const [compiledDefault, setCompiledDefault] = useState<CompiledContract>()
   const { deploy: deployDefault } = useContractFactory({
     compiledContract: compiledDefault,
@@ -90,10 +89,22 @@ export const AccountTypeInformationContentScreen: FC = () => {
   }
 
   const accountType = useAccountType(selectAccountType)
+  //console.log("accountType", accountType)
 
   useEffect(() => {
     if (!accountType) {
       navigate(routes.accountTypeSelection())
+    } else {
+      switch (accountType.key) {
+        case "default": {
+          setUsedParams(["123"])
+          break
+        }
+        case "multisig": {
+          setUsedParams(["123", "5445"])
+          break
+        }
+      }
     }
     if (!compiledMultisig) {
       getCompiledMultisig().then(setCompiledMultisig)
@@ -107,36 +118,39 @@ export const AccountTypeInformationContentScreen: FC = () => {
     return <></>
   }
 
+  const dosome = async () => {
+    console.log("aaa")
+  }
+
   const deployWalletAccount = async () => {
     //useAppState.setState({ isLoading: true })
 
     console.log(accountType.name)
-
-    switch (accountType.key) {
-      case "default": {
-        const calldataDefault = ["1", "2", "3"]
-        console.log("starting deploy")
-        const defaultDeployment = await deployDefault({
-          constructorCalldata: calldataDefault,
-        })
-        if (defaultDeployment) {
-          console.log("deployed to", defaultDeployment.address)
+    if (usedParams) {
+      switch (accountType.key) {
+        case "default": {
+          console.log("starting deploy")
+          const defaultDeployment = await deployDefault({
+            constructorCalldata: usedParams,
+          })
+          if (defaultDeployment) {
+            console.log("deployed to", defaultDeployment.address)
+          }
+          break
         }
-        break
-      }
-      case "multisig": {
-        const calldataMultisig = ["1", "2", "3"]
-        console.log("starting deploy")
-        const multisigDeployment = await deployMultisig({
-          constructorCalldata: calldataMultisig,
-        })
-        if (multisigDeployment) {
-          console.log("deployed to", multisigDeployment.address)
+        case "multisig": {
+          console.log("starting deploy")
+          const multisigDeployment = await deployMultisig({
+            constructorCalldata: usedParams,
+          })
+          if (multisigDeployment) {
+            console.log("deployed to", multisigDeployment.address)
+          }
+          break
         }
-        break
-      }
-      default: {
-        break
+        default: {
+          break
+        }
       }
     }
 
@@ -171,6 +185,18 @@ export const AccountTypeInformationContentScreen: FC = () => {
       <H1>Account Type Selection</H1>
       <AccountList>
         <Paragraph>{accountType.name}</Paragraph>
+        <Paragraph>
+          <>
+            {usedParams &&
+              usedParams.map((p, i) => (
+                <span key={i}>
+                  <span>Parameter {i + 1}:</span>
+                  <input type="text" value={p} onChange={() => dosome}></input>
+                  <br />
+                </span>
+              ))}
+          </>
+        </Paragraph>
         <Button onClick={() => deployWalletAccount()}>
           Deploy Wallet Account
         </Button>

@@ -111,11 +111,22 @@ export const AccountTypeSelectionScreen: FC = () => {
         "This account contract allows you to use other digital signature methods.",
         "2.30 €",
       ),
-    )
+    ),
+      addAccountType(
+        new AccountType(
+          "new",
+          "new",
+          "",
+          "v0.0.1",
+          "Import your own account contract",
+          "",
+        ),
+      )
   }, [])
 
   const handleAddAccountType = async () => {
     useAppState.setState({ isLoading: false })
+    console.log("handling")
     useAccountType.setState({ selectedAccountType: "new" })
     navigate(routes.accountTypeInformation())
     // try {
@@ -149,9 +160,11 @@ export const AccountTypeSelectionScreen: FC = () => {
         {accountTypeList.length === 0 && (
           <Paragraph>No accounts types available.</Paragraph>
         )}
-        {accountTypeList.map((accountType) => (
-          <AccountTypeItem key={accountType.name} accountType={accountType} />
-        ))}
+        {accountTypeList
+          .filter((acc) => acc.name != "new")
+          .map((accountType) => (
+            <AccountTypeItem key={accountType.name} accountType={accountType} />
+          ))}
         <IconButtonCenter size={48} {...makeClickable(handleAddAccountType)}>
           <AddIcon fontSize="large" />
         </IconButtonCenter>

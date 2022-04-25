@@ -142,6 +142,11 @@ export const AccountTypeInformationContentScreen: FC = () => {
           setUsedParamNamess(["Public key"])
           break
         }
+        case "new": {
+          setUsedParams([""])
+          setUsedParamNamess(["Parameters"])
+          break
+        }
       }
     }
     if (!compiledAllowDeny) {
@@ -269,7 +274,8 @@ export const AccountTypeInformationContentScreen: FC = () => {
       <H1>Account Type Selection</H1>
       <AccountList>
         <Paragraph>
-          <H2>{accountType.name}</H2>
+          <b>{accountType.name}</b>
+          <br />
           {accountType.description}
         </Paragraph>
         <Paragraph>
@@ -288,6 +294,18 @@ export const AccountTypeInformationContentScreen: FC = () => {
                   <br />
                 </span>
               ))}
+            {accountType.key == "new" && (
+              <>
+                <div style={{ marginTop: "10p" }}>
+                  <span>Source code:</span>
+                  <textarea rows={5}></textarea>
+                </div>
+                <div style={{ marginTop: "10p" }}>
+                  <span>ABI:</span>
+                  <textarea rows={5}></textarea>
+                </div>
+              </>
+            )}
           </>
         </Paragraph>
         <Button onClick={() => deployWalletAccount()}>

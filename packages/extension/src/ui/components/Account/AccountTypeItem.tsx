@@ -90,6 +90,7 @@ export const AccountTypeItem: FC<AccountListProps> = ({ accountType }) => {
           <AccountName>{accountType.name}</AccountName>
           <p>{accountType.creator}</p>
         </AccountColumn>
+        <AccountColumn>{accountType.price}</AccountColumn>
       </AccountRow>
     </AccountListItemWrapper>
   )

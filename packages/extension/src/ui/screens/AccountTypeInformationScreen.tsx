@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom"
 import { Abi, CompiledContract, Contract, json } from "starknet"
 import styled from "styled-components"
 
+import AllowDenySource from "../../abi/AllowDeny.json"
 import DefaultSource from "../../abi/Default.json"
 import MultisigSource from "../../abi/Multisig.json"
-import AllowDenySource from "../../abi/AllowDeny.json"
 import { WalletAccountSigner } from "../../shared/wallet.model"
 import { Account } from "../Account"
 import { AccountType } from "../AccountType"
@@ -130,6 +130,17 @@ export const AccountTypeInformationContentScreen: FC = () => {
         case "allow_deny_list": {
           setUsedParams(["123"])
           setUsedParamNamess(["Public key"])
+          break
+        }
+        case "fee_insurant": {
+          setUsedParams(["123"])
+          setUsedParamNamess(["Public key"])
+          break
+        }
+        case "custom_crypto": {
+          setUsedParams(["123"])
+          setUsedParamNamess(["Public key"])
+          break
         }
       }
     }
@@ -285,3 +296,4 @@ export const AccountTypeInformationContentScreen: FC = () => {
       </AccountList>
     </AccountListWrapper>
   )
+}

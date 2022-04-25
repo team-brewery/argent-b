@@ -5,6 +5,7 @@ export class AccountType {
   version: string
   description: string
   icon: string
+  price: string
   // contract: Contract
   // proxyContract: Contract
 
@@ -13,7 +14,8 @@ export class AccountType {
     name: string,
     creator: string,
     version: string,
-    description: string
+    description: string,
+    price: string,
   ) {
     this.key = key
     this.name = name
@@ -21,6 +23,7 @@ export class AccountType {
     this.version = version
     this.description = description
     this.icon = ""
+    this.price = price
   }
 
   setIcon(icon: string) {

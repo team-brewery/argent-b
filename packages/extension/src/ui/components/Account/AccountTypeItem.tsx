@@ -82,11 +82,17 @@ export const AccountTypeItem: FC<AccountListProps> = ({
       // className={isDeleteable ? "deleteable" : ""}
       // selected={status.code === "CONNECTED"}
     >
-      <ProfilePicture src={getAccountTypeImageUrl(accountType.name)} />
+      {
+        accountType.icon !== ""  ? (
+          <ProfilePicture src={accountType.icon} />
+        ) : (
+          <ProfilePicture src={getAccountTypeImageUrl(accountType.name)} />
+        )
+      }
       <AccountRow>
         <AccountColumn>
           <AccountName>{accountType.name}</AccountName>
-          <p>Hii</p>
+          <p>{accountType.creator}</p>
         </AccountColumn>
       </AccountRow>
     </AccountListItemWrapper>

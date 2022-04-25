@@ -5,6 +5,7 @@ import styled from "styled-components"
 
 import DefaultSource from "../../abi/Default.json"
 import MultisigSource from "../../abi/Multisig.json"
+import AllowDenySource from "../../abi/AllowDeny.json"
 import { WalletAccountSigner } from "../../shared/wallet.model"
 import { Account } from "../Account"
 import { AccountType } from "../AccountType"
@@ -15,7 +16,7 @@ import { Button } from "../components/Button"
 import { Header } from "../components/Header"
 import { IconButton } from "../components/IconButton"
 import { NetworkSwitcher } from "../components/NetworkSwitcher"
-import { H1, P } from "../components/Typography"
+import { H1, H2, P } from "../components/Typography"
 import { useContractFactory } from "../hooks/useDeploy"
 import { routes } from "../routes"
 import { useAccount, useSelectedAccount } from "../states/account"
@@ -94,6 +95,19 @@ export const AccountTypeInformationContentScreen: FC = () => {
     return compiled
   }
 
+  const [compiledAllowDeny, setCompiledAllowDeny] = useState<CompiledContract>()
+  const { deploy: deployAllowDeny } = useContractFactory({
+    compiledContract: compiledAllowDeny,
+    abi: (AllowDenySource as any).abi as Abi,
+  })
+  const getCompiledAllowDeny = async () => {
+    const raw = await fetch(
+      "https://raw.githubusercontent.com/team-brewery/argent-b/feature/account-selection/packages/extension/src/abi/AllowDeny.json",
+    )
+    const compiled = json.parse(await raw.text())
+    return compiled
+  }
+
   const accountType = useAccountType(selectAccountType)
   //console.log("accountType", accountType)
 
@@ -110,7 +124,13 @@ export const AccountTypeInformationContentScreen: FC = () => {
           setUsedParams(["123", "5445"])
           break
         }
+        case "allow_deny_list": {
+          setUsedParams(["123"])
+        }
       }
+    }
+    if (!compiledAllowDeny) {
+      getCompiledAllowDeny().then(setCompiledAllowDeny)
     }
     if (!compiledMultisig) {
       getCompiledMultisig().then(setCompiledMultisig)
@@ -147,7 +167,7 @@ export const AccountTypeInformationContentScreen: FC = () => {
   }
 
   const deployWalletAccount = async () => {
-    //useAppState.setState({ isLoading: true })
+    useAppState.setState({ isLoading: true })
 
     console.log(accountType.name)
     if (usedParams) {
@@ -161,6 +181,8 @@ export const AccountTypeInformationContentScreen: FC = () => {
           if (currDeployment) {
             console.log("deployed to", currDeployment.address)
             createAccount(currDeployment)
+            useAppState.setState({ isLoading: false })
+            navigate(routes.accounts())
           }
 
           break
@@ -174,6 +196,22 @@ export const AccountTypeInformationContentScreen: FC = () => {
           if (currDeployment) {
             console.log("deployed to", currDeployment.address)
             createAccount(currDeployment)
+            useAppState.setState({ isLoading: false })
+            navigate(routes.accounts())
+          }
+          break
+        }
+        case "allow_deny_list": {
+          console.log("starting deploy")
+          currDeployment = await deployAllowDeny({
+            constructorCalldata: usedParams,
+          })
+
+          if (currDeployment) {
+            console.log("deployed to", currDeployment.address)
+            createAccount(currDeployment)
+            useAppState.setState({ isLoading: false })
+            navigate(routes.accounts())
           }
           break
         }
@@ -213,7 +251,10 @@ export const AccountTypeInformationContentScreen: FC = () => {
       </AccountHeader>
       <H1>Account Type Selection</H1>
       <AccountList>
-        <Paragraph>{accountType.name}</Paragraph>
+        <Paragraph>
+          <H2>{accountType.name}</H2>
+          {accountType.description}
+        </Paragraph>
         <Paragraph>
           <>
             {usedParams &&

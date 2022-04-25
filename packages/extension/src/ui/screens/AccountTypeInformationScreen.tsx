@@ -67,7 +67,7 @@ export const AccountTypeInformationContentScreen: FC = () => {
   const { accounts, selectedAccount, addAccount } = useAccount()
   const { switcherNetworkId } = useAppState()
 
-  const [usedParams, setUsedParams] = useState<string[]>()
+  const [usedParams, setUsedParams] = useState<string[]>([])
   const [compiledMultisig, setCompiledMultisig] = useState<CompiledContract>()
   const { deploy: deployMultisig } = useContractFactory({
     compiledContract: compiledMultisig,
@@ -107,7 +107,7 @@ export const AccountTypeInformationContentScreen: FC = () => {
           break
         }
         case "multisig": {
-          setUsedParams(["123", "5445"])
+          setUsedParams(["1", "123", "1"])
           break
         }
       }
@@ -124,8 +124,10 @@ export const AccountTypeInformationContentScreen: FC = () => {
     return <></>
   }
 
-  const dosome = async () => {
-    console.log("aaa")
+  const modifyParam = async (index: number, value: string) => {
+    const copy = [...usedParams]
+    copy[index] = value
+    setUsedParams(copy)
   }
 
   const createAccount = async (contract: Contract) => {
@@ -172,7 +174,7 @@ export const AccountTypeInformationContentScreen: FC = () => {
           })
 
           if (currDeployment) {
-            console.log("deployed to", currDeployment.address)
+            console.log("deployed to", currDeployment.address, currDeployment)
             createAccount(currDeployment)
           }
           break
@@ -220,7 +222,13 @@ export const AccountTypeInformationContentScreen: FC = () => {
               usedParams.map((p, i) => (
                 <span key={i}>
                   <span>Parameter {i + 1}:</span>
-                  <input type="text" value={p} onChange={() => dosome}></input>
+                  <input
+                    type="text"
+                    value={p}
+                    onChange={(e) => {
+                      modifyParam(i, e.target.value)
+                    }}
+                  ></input>
                   <br />
                 </span>
               ))}

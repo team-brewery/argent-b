@@ -1,8 +1,8 @@
 import {
   useStarknet,
   useStarknetTransactionManager,
-} from "@starknet-react/core";
-import { useCallback, useEffect, useState } from "react";
+} from "@starknet-react/core"
+import { useCallback, useEffect, useState } from "react"
 import {
   Abi,
   CompiledContract,
@@ -10,60 +10,60 @@ import {
   ContractFactory,
   Provider,
   RawCalldata,
-} from "starknet";
-import { BigNumberish } from "starknet/dist/utils/number";
+} from "starknet"
+import { BigNumberish } from "starknet/dist/utils/number"
 
 interface UseContractFactoryArgs {
-  compiledContract?: CompiledContract;
-  abi?: Abi;
+  compiledContract?: CompiledContract
+  abi?: Abi
 }
 
 interface DeployArgs {
-  constructorCalldata: RawCalldata;
-  addressSalt?: BigNumberish;
+  constructorCalldata: RawCalldata
+  addressSalt?: BigNumberish
 }
 
 interface UseContractFactory {
-  factory?: ContractFactory;
+  factory?: ContractFactory
   deploy: ({
     constructorCalldata,
     addressSalt,
-  }: DeployArgs) => Promise<Contract | undefined>;
-  contract?: Contract;
+  }: DeployArgs) => Promise<Contract | undefined>
+  contract?: Contract
 }
 
 export function useContractFactory({
   compiledContract,
   abi,
 }: UseContractFactoryArgs): UseContractFactory {
-  const { library } = useStarknet();
-  const { addTransaction } = useStarknetTransactionManager();
-  const [factory, setFactory] = useState<ContractFactory | undefined>();
-  const [contract, setContract] = useState<Contract | undefined>();
+  const { library } = useStarknet()
+  const { addTransaction } = useStarknetTransactionManager()
+  const [factory, setFactory] = useState<ContractFactory | undefined>()
+  const [contract, setContract] = useState<Contract | undefined>()
 
   useEffect(() => {
     if (compiledContract) {
       setFactory(
-        new ContractFactory(compiledContract, library as Provider, abi)
-      );
+        new ContractFactory(compiledContract, library as Provider, abi),
+      )
     }
-  }, [compiledContract, library, abi]);
+  }, [compiledContract, library, abi])
 
   const deploy = useCallback(
     async ({ constructorCalldata, addressSalt }: DeployArgs) => {
       if (factory) {
-        const contract = await factory.deploy(constructorCalldata, addressSalt);
+        const contract = await factory.deploy(constructorCalldata, addressSalt)
         addTransaction({
           status: "TRANSACTION_RECEIVED",
           transactionHash: contract.deployTransactionHash ?? "",
-        });
-        setContract(contract);
-        return contract;
+        })
+        setContract(contract)
+        return contract
       }
-      return undefined;
+      return undefined
     },
-    [factory]
-  );
+    [factory],
+  )
 
-  return { factory, contract, deploy };
+  return { factory, contract, deploy }
 }

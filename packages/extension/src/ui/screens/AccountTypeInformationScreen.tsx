@@ -189,13 +189,13 @@ export const AccountTypeInformationContentScreen: FC = () => {
   }
 
   const deployWalletAccount = async () => {
-    useAppState.setState({ isLoading: true })
 
     console.log(accountType.name)
     if (usedParams) {
       let currDeployment: Contract | undefined = undefined
       switch (accountType.key) {
         case "default": {
+          useAppState.setState({ isLoading: true })
           console.log("starting deploy")
           currDeployment = await deployDefault({
             constructorCalldata: usedParams,
@@ -210,6 +210,7 @@ export const AccountTypeInformationContentScreen: FC = () => {
           break
         }
         case "multisig": {
+          useAppState.setState({ isLoading: true })
           console.log("starting deploy")
           currDeployment = await deployMultisig({
             constructorCalldata: usedParams,
@@ -224,6 +225,7 @@ export const AccountTypeInformationContentScreen: FC = () => {
           break
         }
         case "allow_deny_list": {
+          useAppState.setState({ isLoading: true })
           console.log("starting deploy")
           currDeployment = await deployAllowDeny({
             constructorCalldata: usedParams,
@@ -283,15 +285,19 @@ export const AccountTypeInformationContentScreen: FC = () => {
             {usedParams &&
               usedParams.map((p, i) => (
                 <span key={i}>
-                  <span>{usedParamNames[i]}:&nbsp;</span>
-                  <input
-                    type="text"
-                    value={p}
-                    onChange={(e) => {
-                      modifyParam(i, e.target.value)
-                    }}
-                  ></input>
-                  <br />
+                  {usedParamNames[i] != "Public key" ? (
+                    <>
+                      <span>{usedParamNames[i]}:&nbsp;</span>
+                      <input
+                        type="text"
+                        value={p}
+                        onChange={(e) => {
+                          modifyParam(i, e.target.value)
+                        }}
+                      ></input>
+                      <br />
+                    </>
+                  ):(<></>)}
                 </span>
               ))}
             {accountType.key == "new" && (

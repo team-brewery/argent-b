@@ -3,7 +3,7 @@ export class AccountType {
   name: string
   creator: string
   version: string
-  description: string
+  description: string[]
   icon: string
   price: string
   // contract: Contract
@@ -14,7 +14,7 @@ export class AccountType {
     name: string,
     creator: string,
     version: string,
-    description: string,
+    description: string[],
     price: string,
   ) {
     this.key = key

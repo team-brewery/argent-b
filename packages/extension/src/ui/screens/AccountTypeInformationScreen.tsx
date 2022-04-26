@@ -278,8 +278,11 @@ export const AccountTypeInformationContentScreen: FC = () => {
         <Paragraph>
           <b>{accountType.name}</b>
           <br />
-          {accountType.description}
         </Paragraph>
+        {accountType.description &&
+          accountType.description.map((string, i) => (
+            <>{string}<br /></>
+        ))}
         <Paragraph>
           <>
             {usedParams &&
